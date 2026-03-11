@@ -1,0 +1,331 @@
+import { useState, useRef, useEffect } from 'react';
+import './MemeGenerator.css';
+
+function MemeGenerator() {
+  const [topText, setTopText] = useState('');
+  const [bottomText, setBottomText] = useState('');
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const canvasRef = useRef(null);
+
+  // Popular meme templates for B.Tech students
+  const memeTemplates = [
+    {
+      id: 1,
+      url: 'https://i.imgflip.com/1bij.jpg',
+      name: 'Distracted Boyfriend',
+      description: 'When you get distracted by new tech during studies'
+    },
+    {
+      id: 2,
+      url: 'https://i.imgflip.com/1bgw.jpg',
+      name: 'Drake Hotline Bling',
+      description: 'Rejecting old code, approving new frameworks'
+    },
+    {
+      id: 3,
+      url: 'https://i.imgflip.com/1otk.jpg',
+      name: 'Two Buttons',
+      description: 'Debug vs. Rewrite everything'
+    },
+    {
+      id: 4,
+      url: 'https://i.imgflip.com/1o00in.jpg',
+      name: 'Doge',
+      description: 'Such code, very bug, wow!'
+    },
+    {
+      id: 5,
+      url: 'https://i.imgflip.com/1bgw.jpg',
+      name: 'This is Fine',
+      description: 'When your code is burning but you pretend it\'s fine'
+    },
+    {
+      id: 6,
+      url: 'https://i.imgflip.com/1bij.jpg',
+      name: 'Change My Mind',
+      description: 'Convincing others about your coding opinions'
+    },
+    {
+      id: 7,
+      url: 'https://i.imgflip.com/1ihzfe.jpg',
+      name: 'Expanding Brain',
+      description: 'From basic code to advanced algorithms'
+    },
+    {
+      id: 8,
+      url: 'https://i.imgflip.com/1jwhww.jpg',
+      name: 'Mocking SpongeBob',
+      description: 'When someone questions your code quality'
+    },
+    {
+      id: 9,
+      url: 'https://i.imgflip.com/1g8my4.jpg',
+      name: 'Woman Yelling at Cat',
+      description: 'Frontend vs Backend developers'
+    },
+    {
+      id: 10,
+      url: 'https://i.imgflip.com/1ur9b0.jpg',
+      name: 'Ancient Aliens',
+      description: 'When you discover old legacy code'
+    },
+    {
+      id: 11,
+      url: 'https://i.imgflip.com/1h7in3.jpg',
+      name: 'Left Exit 12 Off Ramp',
+      description: 'Getting lost in complex codebases'
+    },
+    {
+      id: 12,
+      url: 'https://i.imgflip.com/1v5c7.jpg',
+      name: 'One Does Not Simply',
+      description: 'One does not simply debug recursive functions'
+    }
+  ];
+
+  const selectTemplate = (template) => {
+    setSelectedTemplate(template);
+    // Load the template image
+    const img = new Image();
+    img.onload = () => {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      setGeneratedImage(canvas.toDataURL());
+    };
+    img.src = template.url;
+  };
+
+  // Generate a random background based on text content
+  const generateMemeFromText = () => {
+    if (!selectedTemplate) {
+      alert('Please select a meme template first!');
+      return;
+    }
+
+    if (!topText.trim() && !bottomText.trim()) {
+      alert('Please enter some text for your meme!');
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      // Style for text
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 4;
+      ctx.font = 'bold 36px Impact';
+      ctx.textAlign = 'center';
+
+      // Top text
+      if (topText) {
+        ctx.strokeText(topText.toUpperCase(), canvas.width / 2, 60);
+        ctx.fillText(topText.toUpperCase(), canvas.width / 2, 60);
+      }
+
+      // Bottom text
+      if (bottomText) {
+        ctx.strokeText(bottomText.toUpperCase(), canvas.width / 2, canvas.height - 30);
+        ctx.fillText(bottomText.toUpperCase(), canvas.width / 2, canvas.height - 30);
+      }
+
+      setGeneratedImage(canvas.toDataURL());
+    };
+
+    img.src = selectedTemplate.url;
+  };
+
+  const addTextToCanvas = (imageSrc) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      ctx.drawImage(img, 0, 0);
+
+      // Style for text
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 4;
+      ctx.font = 'bold 36px Impact';
+      ctx.textAlign = 'center';
+
+      // Top text
+      if (topText) {
+        ctx.strokeText(topText.toUpperCase(), canvas.width / 2, 60);
+        ctx.fillText(topText.toUpperCase(), canvas.width / 2, 60);
+      }
+
+      // Bottom text
+      if (bottomText) {
+        ctx.strokeText(bottomText.toUpperCase(), canvas.width / 2, canvas.height - 30);
+        ctx.fillText(bottomText.toUpperCase(), canvas.width / 2, canvas.height - 30);
+      }
+    };
+
+    img.src = imageSrc;
+  };
+
+  // Generate initial background on component mount
+  useEffect(() => {
+    // Start with a blank canvas
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = 500;
+      canvas.height = 500;
+      ctx.fillStyle = '#f5f5f5';
+      ctx.fillRect(0, 0, 500, 500);
+      ctx.fillStyle = '#666';
+      ctx.font = 'bold 24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Enter text and click', 250, 240);
+      ctx.fillText('"Generate Meme"', 250, 270);
+    }
+  }, []);
+
+  const addTextToMeme = () => {
+    if (!generatedImage) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      ctx.drawImage(img, 0, 0);
+
+      // Style for text
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 4;
+      ctx.font = 'bold 36px Impact';
+      ctx.textAlign = 'center';
+
+      // Top text
+      if (topText) {
+        ctx.strokeText(topText.toUpperCase(), canvas.width / 2, 60);
+        ctx.fillText(topText.toUpperCase(), canvas.width / 2, 60);
+      }
+
+      // Bottom text
+      if (bottomText) {
+        ctx.strokeText(bottomText.toUpperCase(), canvas.width / 2, canvas.height - 30);
+        ctx.fillText(bottomText.toUpperCase(), canvas.width / 2, canvas.height - 30);
+      }
+    };
+
+    img.src = generatedImage;
+  };
+
+  const downloadMeme = () => {
+    const canvas = canvasRef.current;
+    const link = document.createElement('a');
+    link.download = 'generated-meme.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  };
+
+  return (
+    <div className="meme-generator">
+      <header className="header">
+        <h1>Meme Generator</h1>
+        <button className="logout-btn" onClick={() => window.location.reload()}>
+          Logout
+        </button>
+      </header>
+
+      <div className="generator-container">
+        <div className="main-content">
+          <div className="controls">
+          <div className="text-inputs">
+            <div className="input-group">
+              <label htmlFor="topText">Top Text</label>
+              <input
+                type="text"
+                id="topText"
+                value={topText}
+                onChange={(e) => setTopText(e.target.value)}
+                placeholder="Enter top text"
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="bottomText">Bottom Text</label>
+              <input
+                type="text"
+                id="bottomText"
+                value={bottomText}
+                onChange={(e) => setBottomText(e.target.value)}
+                placeholder="Enter bottom text"
+              />
+            </div>
+          </div>
+
+        <div className="main-content">
+          <div className="controls">
+            <div className="text-inputs">
+              <div className="input-group">
+                <label htmlFor="topText">Top Text</label>
+                <input
+                  type="text"
+                  id="topText"
+                  value={topText}
+                  onChange={(e) => setTopText(e.target.value)}
+                  placeholder="Enter top text"
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="bottomText">Bottom Text</label>
+                <input
+                  type="text"
+                  id="bottomText"
+                  value={bottomText}
+                  onChange={(e) => setBottomText(e.target.value)}
+                  placeholder="Enter bottom text"
+                />
+              </div>
+            </div>
+
+            <div className="action-buttons">
+              <button onClick={generateMemeFromText} className="generate-btn">
+                Generate Meme
+              </button>
+              <button onClick={downloadMeme} className="download-btn">
+                Download Meme
+              </button>
+            </div>
+          </div>
+
+          <div className="preview-section">
+            <h3>Meme Preview</h3>
+            <div className="meme-preview">
+              <div className="placeholder">
+                <div className="placeholder-icon">🎨</div>
+                <p>Select a template and enter text to generate your meme!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default MemeGenerator;
